@@ -700,7 +700,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr& pc) {
 
   {
       // write to file:
-      static std::ofstream posesFile ("./dlo_after_map_poses.txt");
+      static std::ofstream posesFile ("./direct_lidar_odometry_after_map_poses.txt");
       if( posesFile.is_open() )
       {
           posesFile << (this->scan_stamp.toNSec()) << " " << this->pose.x() << " " << this->pose.y() << " " << this->pose.z()
