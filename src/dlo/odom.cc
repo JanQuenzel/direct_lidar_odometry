@@ -698,6 +698,17 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr& pc) {
   this->debug_thread = std::thread( &dlo::OdomNode::debug, this );
   this->debug_thread.detach();
 
+  {
+      // write to file:
+      static std::ofstream posesFile ("./dlo_after_map_poses.txt");
+      if( posesFile.is_open() )
+      {
+          posesFile << (this->scan_stamp.toNSec()) << " " << this->pose.x() << " " << this->pose.y() << " " << this->pose.z()
+                    << " " << this->rotq.x() << " " << this->rotq.y() << " " << this->rotq.z() << " " << this->rotq.w() <<"\n";
+      }
+  }
+
+
 }
 
 
