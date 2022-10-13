@@ -222,6 +222,8 @@ private:
   bool adaptive_params_use_;
 
   bool imu_use_;
+  bool imu_calibrate_;
+  double scan_time_offset_;
   int imu_calib_time_;
   int imu_buffer_size_;
 

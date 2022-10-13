@@ -14,6 +14,8 @@ dlo:
   adaptiveParams: true
 
   imu: true
+  imu_calibrate: true
+  scan_time_offset: 0.09
   gravityAlign: true
 
   odomNode:

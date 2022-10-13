@@ -241,6 +241,8 @@ void dlo::OdomNode::getParams() {
 
   // IMU
   ros::param::param<bool>("~dlo/imu", this->imu_use_, false);
+  ros::param::param<bool>("~dlo/imu_calibrate", this->imu_calibrate_, false);
+  ros::param::param<double>("~dlo/scan_time_offset", this->scan_time_offset_, 0.0); // to move between stamp being first or last in scan
   ros::param::param<int>("~dlo/odomNode/imu/calibTime", this->imu_calib_time_, 3);
   ros::param::param<int>("~dlo/odomNode/imu/bufferSize", this->imu_buffer_size_, 2000);
 
@@ -271,7 +273,7 @@ void dlo::OdomNode::getParams() {
 void dlo::OdomNode::start() {
   ROS_INFO("Starting DLO Odometry Node");
 
-  printf("\033[2J\033[1;1H");
+  //printf("\033[2J\033[1;1H");
   std::cout << std::endl << "==== Direct LiDAR Odometry v" << this->version_ << " ====" << std::endl << std::endl;
 
 }
@@ -590,6 +592,10 @@ void dlo::OdomNode::gravityAlign() {
 void dlo::OdomNode::initializeDLO() {
 
   // Calibrate IMU
+  if ( !this->imu_calibrate_ ) {
+    this->imu_calibrated = true;
+  }
+
   if (!this->imu_calibrated && this->imu_use_) {
     return;
   }
@@ -634,7 +640,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr& pc) {
 
   double then = ros::Time::now().toSec();
   this->scan_stamp = pc->header.stamp;
-  this->curr_frame_stamp = pc->header.stamp.toSec();
+  this->curr_frame_stamp = pc->header.stamp.toSec() + scan_time_offset_;
 
   // If there are too few points in the pointcloud, try again
   this->current_scan = pcl::PointCloud<PointType>::Ptr (new pcl::PointCloud<PointType>);
@@ -1418,7 +1424,7 @@ void dlo::OdomNode::debug() {
   double avg_cpu_usage = std::accumulate(this->cpu_percents.begin(), this->cpu_percents.end(), 0.0) / this->cpu_percents.size();
 
   // Print to terminal
-  printf("\033[2J\033[1;1H");
+  //printf("\033[2J\033[1;1H");
 
   std::cout << std::endl << "==== Direct LiDAR Odometry v" << this->version_ << " ====" << std::endl;
 
@@ -1438,4 +1444,6 @@ void dlo::OdomNode::debug() {
   std::cout << "CPU Load         :: " << std::setfill(' ') << std::setw(6) << cpu_percent << " %     // Avg: " << std::setw(5) << avg_cpu_usage << std::endl;
   std::cout << "RAM Allocation   :: " << std::setfill(' ') << std::setw(6) << resident_set/1000. << " MB    // VSZ: " << vm_usage/1000. << " MB" << std::endl;
 
+  std::cout << "calib: " << imu_calibrate_ <<std::endl;
+  std::cout << "offset: " << scan_time_offset_ << std::endl;
 }
