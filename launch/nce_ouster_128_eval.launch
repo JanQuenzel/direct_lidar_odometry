@@ -20,7 +20,7 @@
   <node ns="$(arg robot_namespace)" name="dlo_odom" pkg="direct_lidar_odometry" type="dlo_odom_node" output="screen" clear_params="true">
 
     <!-- Load parameters -->
-    <rosparam file="$(find direct_lidar_odometry)/cfg/dlo.yaml" command="load"/>
+    <rosparam file="$(find direct_lidar_odometry)/cfg/dlo_nce.yaml" command="load"/>
     <rosparam file="$(find direct_lidar_odometry)/cfg/params.yaml" command="load"/>
 
     <!-- Subscriptions -->
