@@ -15,7 +15,7 @@ dlo:
 
   imu: true
   imu_calibrate: true
-  scan_time_offset: 0.0
+  stamp_at_the_front: false
   gravityAlign: true
 
   odomNode:

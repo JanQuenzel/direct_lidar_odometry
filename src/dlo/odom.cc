@@ -242,7 +242,7 @@ void dlo::OdomNode::getParams() {
   // IMU
   ros::param::param<bool>("~dlo/imu", this->imu_use_, false);
   ros::param::param<bool>("~dlo/imu_calibrate", this->imu_calibrate_, false);
-  ros::param::param<double>("~dlo/scan_time_offset", this->scan_time_offset_, 0.0); // to move between stamp being first or last in scan
+  ros::param::param<bool>("~dlo/stamp_at_the_front", this->stamp_at_the_front_, false); // to move between stamp being first or last in scan
   ros::param::param<int>("~dlo/odomNode/imu/calibTime", this->imu_calib_time_, 3);
   ros::param::param<int>("~dlo/odomNode/imu/bufferSize", this->imu_buffer_size_, 2000);
 
@@ -639,8 +639,29 @@ void dlo::OdomNode::initializeDLO() {
 void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr& pc) {
 
   double then = ros::Time::now().toSec();
+  double scan_time_offset = 0.;
+  if ( this->stamp_at_the_front_ )
+  {
+      uint32_t offset_time = 0;
+      for(size_t i=0; i<pc->fields.size(); ++i)
+          if ( pc->fields[i].name=="t" )
+              offset_time = pc->fields[i].offset;
+
+      int64_t new_stamp_offset = 0;
+      const uint32_t point_step = pc->point_step;
+      const size_t num_points = pc->width * pc->height;
+      for ( int point_idx = num_points-1; point_idx >= 0 && new_stamp_offset == 0; --point_idx )
+      {
+          const uint32_t & t_ns = *reinterpret_cast<const uint32_t*>(&pc->data[pc->point_step * point_idx + offset_time]);
+          if ( t_ns <= 0 ) continue;
+          new_stamp_offset = t_ns;
+      }
+      scan_time_offset = new_stamp_offset * 1e-9;
+  }
+
+
   this->scan_stamp = pc->header.stamp;
-  this->curr_frame_stamp = pc->header.stamp.toSec() + scan_time_offset_;
+  this->curr_frame_stamp = pc->header.stamp.toSec() + scan_time_offset;
 
   // If there are too few points in the pointcloud, try again
   this->current_scan = pcl::PointCloud<PointType>::Ptr (new pcl::PointCloud<PointType>);
@@ -1443,7 +1464,4 @@ void dlo::OdomNode::debug() {
   std::cout << "Cores Utilized   :: " << std::setfill(' ') << std::setw(6) << (cpu_percent/100.) * this->numProcessors << " cores // Avg: " << std::setw(5) << (avg_cpu_usage/100.) * this->numProcessors << std::endl;
   std::cout << "CPU Load         :: " << std::setfill(' ') << std::setw(6) << cpu_percent << " %     // Avg: " << std::setw(5) << avg_cpu_usage << std::endl;
   std::cout << "RAM Allocation   :: " << std::setfill(' ') << std::setw(6) << resident_set/1000. << " MB    // VSZ: " << vm_usage/1000. << " MB" << std::endl;
-
-  std::cout << "calib: " << imu_calibrate_ <<std::endl;
-  std::cout << "offset: " << scan_time_offset_ << std::endl;
 }
