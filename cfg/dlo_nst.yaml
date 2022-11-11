@@ -13,7 +13,8 @@ dlo:
 
   adaptiveParams: true
 
-  imu: true
+  imu: true # not for sequences B,E
+  #imu: false # for sequences B,E
   imu_calibrate: true
   stamp_at_the_front: false
   gravityAlign: true
