@@ -731,7 +731,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr& pc) {
       if( posesFile.is_open() )
       {
           posesFile << (this->scan_stamp.toNSec()) << " " << this->pose.x() << " " << this->pose.y() << " " << this->pose.z()
-                    << " " << this->rotq.x() << " " << this->rotq.y() << " " << this->rotq.z() << " " << this->rotq.w() <<"\n";
+                    << " " << this->rotq.x() << " " << this->rotq.y() << " " << this->rotq.z() << " " << this->rotq.w() << std::endl;
       }
   }
 
