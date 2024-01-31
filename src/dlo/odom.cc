@@ -432,6 +432,7 @@ void dlo::OdomNode::publishKeyframe() {
   this->kf_pub.publish(this->kf);
 
   // Publish keyframe scan
+  if ( this->keyframe_pub.getNumSubscribers() == 0 ) return;
   if (this->keyframe_cloud->points.size() == this->keyframe_cloud->width * this->keyframe_cloud->height) {
     sensor_msgs::PointCloud2 keyframe_cloud_ros;
     pcl::toROSMsg(*this->keyframe_cloud, keyframe_cloud_ros);

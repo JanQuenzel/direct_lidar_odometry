@@ -104,7 +104,7 @@ void dlo::MapNode::abortTimerCB(const ros::TimerEvent& e) {
  **/
 
 void dlo::MapNode::publishTimerCB(const ros::TimerEvent& e) {
-
+  if ( this->map_pub.getNumSubscribers() == 0 ) return;
   if (this->dlo_map->points.size() == this->dlo_map->width * this->dlo_map->height) {
     sensor_msgs::PointCloud2 map_ros;
     pcl::toROSMsg(*this->dlo_map, map_ros);
@@ -136,6 +136,7 @@ void dlo::MapNode::keyframeCB(const sensor_msgs::PointCloud2ConstPtr& keyframe) 
   *this->dlo_map += *keyframe_pcl;
 
   if (!this->publish_full_map_) {
+    if ( this->map_pub.getNumSubscribers() == 0 ) return;
     if (keyframe_pcl->points.size() == keyframe_pcl->width * keyframe_pcl->height) {
       sensor_msgs::PointCloud2 map_ros;
       pcl::toROSMsg(*keyframe_pcl, map_ros);
