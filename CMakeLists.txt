@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(direct_lidar_odometry)
 
-add_compile_options(-std=c++14)
+add_compile_options(-std=c++17)
 set(CMAKE_BUILD_TYPE "Release")
 
 find_package( PCL REQUIRED )
